@@ -15,6 +15,8 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  *
@@ -34,7 +36,7 @@ public class MySystemTray {
         this.menu.add(showMenuItem());
         this.menu.add(hideMenuItem());
         this.menu.addSeparator();
-    }
+    } 
 
     public boolean initSystemTray() {
         if (!SystemTray.isSupported()) {
@@ -50,6 +52,7 @@ public class MySystemTray {
         }
         Image image = Toolkit.getDefaultToolkit().createImage(imagePath);
         this.trayIcon = new TrayIcon(image, title, menu);
+        mouseEvent();
         return this.systemTray != null && this.trayIcon != null;
     }
 
@@ -104,6 +107,33 @@ public class MySystemTray {
             }
         }
         return false;
+    }
+    
+    private void mouseEvent() {
+        this.trayIcon.addMouseListener( new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1 && e.getButton() == MouseEvent.BUTTON1) {
+                    component.setVisible(true);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
 
 }
