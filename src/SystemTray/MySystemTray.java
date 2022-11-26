@@ -10,11 +10,14 @@ import java.awt.AWTException;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.MenuItem;
+import java.awt.MenuShortcut;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -26,10 +29,14 @@ public class MySystemTray {
 
     private final Component component;
     private TrayIcon trayIcon;
-    private SystemTray systemTray;
+    private final SystemTray systemTray;
     private final PopupMenu menu;
 
-    public MySystemTray(Component ui) {
+    public MySystemTray(Component ui) throws Exception {
+         if (!SystemTray.isSupported()) {
+            throw new Exception("SystemTray is not supported");
+        }
+        this.systemTray = SystemTray.getSystemTray();
         this.component = ui;
         this.menu = new PopupMenu("Menu");
         this.menu.addSeparator();
@@ -37,14 +44,6 @@ public class MySystemTray {
         this.menu.add(hideMenuItem());
         this.menu.addSeparator();
     } 
-
-    public boolean initSystemTray() {
-        if (!SystemTray.isSupported()) {
-            return false;
-        }
-        this.systemTray = SystemTray.getSystemTray();
-        return this.systemTray != null;
-    }
 
     public boolean initTrayIcon(String imagePath, String title) {
         if (imagePath == null || title == null) {
@@ -70,6 +69,12 @@ public class MySystemTray {
         }
     }
 
+    public void addMenuItem(String title, MenuShortcut menuShortcut, ActionListener actionListener ) {
+        MenuItem menuItem = new MenuItem(title, menuShortcut);
+        menuItem.addActionListener(actionListener);
+        addMenuItem(menuItem);
+    }
+    
     public void addMenuItem(MenuItem menuItem) {
         if (menuItem == null) {
             return;
@@ -83,6 +88,7 @@ public class MySystemTray {
 
     private MenuItem showMenuItem() {
         MenuItem menuItem = new MenuItem("Show");
+        menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_S, false));
         menuItem.addActionListener((ActionEvent e) -> {
             this.component.setVisible(true);
         });
@@ -91,6 +97,7 @@ public class MySystemTray {
 
     private MenuItem hideMenuItem() {
         MenuItem menuItem = new MenuItem("Hide");
+        menuItem.setShortcut(new MenuShortcut(KeyEvent.VK_H, false));
         menuItem.addActionListener((ActionEvent e) -> {
             this.component.setVisible(false);
         });
